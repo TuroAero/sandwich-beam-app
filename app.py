@@ -320,20 +320,19 @@ def _draw_bar_chart() -> plt.Figure:
         # Guard against log(0)
         vals = [max(v_s, 1e-30), max(v_i, 1e-30)]
         bars = ax.bar(LABELS, vals, color=COLORS, edgecolor="white", lw=0.5, width=0.55)
-        ax.set_yscale("log")
-        ax.set_ylim(top=max(vals) * 4)  # reserve headroom so labels stay inside the axes
+        ax.set_ylim(bottom=0, top=max(vals) * 1.5)
         ax.set_title(title, fontsize=8, fontweight="bold", pad=4)
         ax.tick_params(labelsize=6.5)
         ax.set_facecolor("#f8f8f8")
         for bar, val in zip(bars, [v_s, v_i]):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                bar.get_height() * 1.4,
+                bar.get_height() + max(vals) * 0.03,
                 f"{val:.2e}",
                 ha="center", va="bottom", fontsize=5.5, color="#222",
             )
 
-    fig.suptitle("Metric comparison  (log scale)", fontsize=9, fontweight="bold")
+    fig.suptitle("Metric comparison", fontsize=9, fontweight="bold")
     return fig
 
 
