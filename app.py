@@ -33,16 +33,16 @@ CORE_MATS: dict[str, dict] = {
 with st.sidebar:
     st.header("🔧 Configuration")
 
-    L_mm = st.slider("Beam Length (mm)", 100, 5000, 1000, step=50)
+    L_mm = st.slider("Beam Length (mm)", 100, 5000, 1000, step=10)
     L = L_mm / 1000.0
-    b_mm = st.slider("Shared width  b  (mm)", 10, 500, 100, step=5, key="b_shared")
+    b_mm = st.slider("Shared width  b  (mm)", 10, 500, 100, step=1, key="b_shared")
 
     st.divider()
 
     # ── Sandwich beam ────────────────────────────────────────────────────────────────────────────────
     with st.expander("🥪 Sandwich Beam", expanded=True):
         tf_mm  = st.slider("Facesheet thickness  tᶠ  (mm)", 1, 30, 3, step=1, key="s_tf")
-        hc_mm  = st.slider("Core thickness  hc  (mm)", 5, 200, 50, step=5, key="s_hc")
+        hc_mm  = st.slider("Core thickness  hc  (mm)", 5, 200, 50, step=1, key="s_hc")
 
         st.markdown("**Facesheet material**")
         face_sel = st.selectbox(
@@ -81,10 +81,10 @@ with st.sidebar:
     # ── I-Beam ────────────────────────────────────────────────────────────────
     with st.expander("⟪ I-Beam", expanded=True):
         b_bot_mm = st.slider(
-            "Bottom flange width  b_bot  (mm)", 10, b_mm, b_mm, step=5,
+            "Bottom flange width  b_bot  (mm)", 10, b_mm, b_mm, step=1,
             key=f"i_b_bot_{b_mm}",
         )
-        h_i_mm  = st.slider("Total height  h_I  (mm)", 20, 500, 100, step=5, key="i_h")
+        h_i_mm  = st.slider("Total height  h_I  (mm)", 20, 500, 100, step=1, key="i_h")
         tf_i_mm = st.slider("Flange thickness  tᶠ_I  (mm)", 1, 50, 8, step=1, key="i_tf")
         tw_i_mm = st.slider("Web thickness  t_w  (mm)", 1, 50, 5, step=1, key="i_tw")
 
@@ -230,20 +230,20 @@ def _draw_cross_sections() -> plt.Figure:
     C_NA     = "crimson"
 
     # ── Sandwich ──────────────────────────────────────────────────────────────
-    hw = b_s_mm / 2
+    hw = b_mm / 2
     # Bottom facesheet
     ax1.add_patch(patches.Rectangle(
-        (-hw, 0), b_s_mm, tf_mm,
+        (-hw, 0), b_mm, tf_mm,
         fc=C_FACE, ec=C_FACE_E, lw=1.5, label="Facesheet", zorder=3,
     ))
     # Core
     ax1.add_patch(patches.Rectangle(
-        (-hw, tf_mm), b_s_mm, hc_mm,
+        (-hw, tf_mm), b_mm, hc_mm,
         fc=C_CORE, ec=C_CORE_E, lw=1.0, hatch="////", label="Core", zorder=3,
     ))
     # Top facesheet
     ax1.add_patch(patches.Rectangle(
-        (-hw, tf_mm + hc_mm), b_s_mm, tf_mm,
+        (-hw, tf_mm + hc_mm), b_mm, tf_mm,
         fc=C_FACE, ec=C_FACE_E, lw=1.5, zorder=3,
     ))
     ax1.axhline(h_s_mm / 2, color=C_NA, ls="--", lw=1.2, alpha=0.8, label="Neutral axis")
@@ -263,11 +263,12 @@ def _draw_cross_sections() -> plt.Figure:
     ax1.set_facecolor("#f8f8f8")
 
     # ── I-Beam ────────────────────────────────────────────────────────────────
-    hw2      = b_i_mm / 2
+    hw2      = b_mm / 2  # top flange (shared width) sets the reference half-width
     h_web_mm = h_i_mm - 2 * tf_i_mm
-    # Bottom flange
+    y_c_i_mm = y_c_i * 1000.0
+    # Bottom flange (may be narrower than top flange)
     ax2.add_patch(patches.Rectangle(
-        (-hw2, 0), b_i_mm, tf_i_mm,
+        (-b_bot_mm / 2, 0), b_bot_mm, tf_i_mm,
         fc=C_FLANGE, ec=C_FLANGE_E, lw=1.5, label="Flange", zorder=3,
     ))
     # Web
@@ -275,19 +276,19 @@ def _draw_cross_sections() -> plt.Figure:
         (-tw_i_mm / 2, tf_i_mm), tw_i_mm, h_web_mm,
         fc=C_WEB, ec=C_WEB_E, lw=1.0, label="Web", zorder=3,
     ))
-    # Top flange
+    # Top flange (full shared width)
     ax2.add_patch(patches.Rectangle(
-        (-hw2, h_i_mm - tf_i_mm), b_i_mm, tf_i_mm,
+        (-hw2, h_i_mm - tf_i_mm), b_mm, tf_i_mm,
         fc=C_FLANGE, ec=C_FLANGE_E, lw=1.5, zorder=3,
     ))
-    ax2.axhline(h_i_mm / 2, color=C_NA, ls="--", lw=1.2, alpha=0.8, label="Neutral axis")
+    ax2.axhline(y_c_i_mm, color=C_NA, ls="--", lw=1.2, alpha=0.8, label="Neutral axis")
 
     ax2.set_xlim(-hw2 - margin_w, hw2 + margin_w)
     ax2.set_ylim(y_lo, y_hi)
     ax2.set_aspect("equal", adjustable="box")
     ax2.set_title(
         f"I-Beam  (h = {h_i_mm} mm)\n"
-        f"b = {b_i_mm} mm · tᶠ = {tf_i_mm} mm · t_w = {tw_i_mm} mm",
+        f"b_top={b_mm} · b_bot={b_bot_mm} · tf={tf_i_mm} · tw={tw_i_mm}  mm",
         fontsize=8, fontweight="bold",
     )
     ax2.set_xlabel("Width (mm)", fontsize=7)
