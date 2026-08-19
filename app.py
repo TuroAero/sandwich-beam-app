@@ -217,7 +217,7 @@ def _draw_cross_sections() -> plt.Figure:
     y_lo = -margin_h
     y_hi = max_h + margin_h
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 5.0), facecolor="#f8f8f8")
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5), facecolor="#f8f8f8")
 
     C_FACE   = "#1565C0"
     C_FACE_E = "#0D47A1"
@@ -311,7 +311,7 @@ def _draw_bar_chart() -> plt.Figure:
     LABELS = ["Sandwich", "I-Beam"]
     COLORS = ["#1565C0", "#BF360C"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(6, 5.0), facecolor="#f8f8f8",
+    fig, axes = plt.subplots(2, 2, figsize=(14, 5.5), facecolor="#f8f8f8",
                              constrained_layout=True)
     for ax, (title, v_s, v_i) in zip(axes.flat, metric_data):
         # Guard against log(0)
@@ -334,16 +334,12 @@ def _draw_bar_chart() -> plt.Figure:
 
 
 # ── Render visualizations ─────────────────────────────────────────────────────
-vis_col, bar_col = st.columns([3, 2])
+st.subheader("Cross-Section Geometry")
+fig_cs = _draw_cross_sections()
+st.pyplot(fig_cs, use_container_width=True)
+plt.close(fig_cs)
 
-with vis_col:
-    st.subheader("Cross-Section Geometry")
-    fig_cs = _draw_cross_sections()
-    st.pyplot(fig_cs)
-    plt.close(fig_cs)
-
-with bar_col:
-    st.subheader("Metric Comparison")
-    fig_bc = _draw_bar_chart()
-    st.pyplot(fig_bc)
-    plt.close(fig_bc)
+st.subheader("Metric Comparison")
+fig_bc = _draw_bar_chart()
+st.pyplot(fig_bc, use_container_width=True)
+plt.close(fig_bc)
