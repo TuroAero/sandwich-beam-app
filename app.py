@@ -42,7 +42,7 @@ with st.sidebar:
     # ── Sandwich beam ────────────────────────────────────────────────────────────────────────────────
     with st.expander("🥪 Sandwich Beam", expanded=True):
         tf_mm  = st.slider("Facesheet thickness  tᶠ  (mm)", 1, 30, 3, step=1, key="s_tf")
-        hc_mm  = st.slider("Core thickness  hc  (mm)", 5, 200, 50, step=1, key="s_hc")
+        hc_mm  = st.slider("Core thickness  hc  (mm)", 0, 200, 50, step=1, key="s_hc")
 
         st.markdown("**Facesheet material**")
         face_sel = st.selectbox(
@@ -84,12 +84,12 @@ with st.sidebar:
             "Bottom flange width  b_bot  (mm)", 10, b_mm, b_mm, step=1,
             key=f"i_b_bot_{b_mm}",
         )
+        tf_i_mm = st.slider("Flange thickness  tᴿ_I  (mm)", 1, 50, 8, step=1, key="i_tf")
         h_i_mm = st.number_input(
-            "Total height  h_I  (mm)", min_value=20, max_value=500,
-            value=100, step=1, key="i_h",
+            "Total height  h_I  (mm)", min_value=2 * tf_i_mm, max_value=500,
+            value=max(100, 2 * tf_i_mm), step=1, key="i_h",
         )
-        tf_i_mm = st.slider("Flange thickness  tᶠ_I  (mm)", 1, 50, 8, step=1, key="i_tf")
-        tw_i_mm = st.slider("Web thickness  t_w  (mm)", 1, 50, 5, step=1, key="i_tw")
+        tw_i_mm = st.slider("Web thickness  t_w  (mm)", 0, 50, 5, step=1, key="i_tw")
 
         st.markdown("**I-Beam material**")
         beam_sel = st.selectbox(
@@ -121,11 +121,7 @@ E_i_Pa = E_i_GPa   * 1e9
 
 # ── Input validation ──────────────────────────────────────────────────────────
 errors: list[str] = []
-if 2 * tf_i_mm >= h_i_mm:
-    errors.append(
-        "I-Beam: 2·tᶠ_I ≥ h_I — reduce flange thickness or increase total height."
-    )
-if tw_i_mm >= b_bot_mm:
+if tw_i_mm > 0 and tw_i_mm >= b_bot_mm:
     errors.append(
         "I-Beam: t_w ≥ b_bot — reduce web thickness or increase bottom flange width."
     )
