@@ -336,10 +336,10 @@ def _draw_bar_chart() -> plt.Figure:
 # ── Render visualizations ─────────────────────────────────────────────────────
 st.subheader("Cross-Section Geometry")
 fig_cs = _draw_cross_sections()
-st.pyplot(fig_cs, use_container_width=True)
+st.pyplot(fig_cs, width="stretch")
 plt.close(fig_cs)
 
 st.subheader("Metric Comparison")
 fig_bc = _draw_bar_chart()
-st.pyplot(fig_bc, use_container_width=True)
+st.pyplot(fig_bc, width="stretch")
 plt.close(fig_bc)
