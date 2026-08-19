@@ -84,7 +84,10 @@ with st.sidebar:
             "Bottom flange width  b_bot  (mm)", 10, b_mm, b_mm, step=1,
             key=f"i_b_bot_{b_mm}",
         )
-        h_i_mm  = st.slider("Total height  h_I  (mm)", 20, 500, 100, step=1, key="i_h")
+        h_i_mm = st.number_input(
+            "Total height  h_I  (mm)", min_value=20, max_value=500,
+            value=100, step=1, key="i_h",
+        )
         tf_i_mm = st.slider("Flange thickness  tᶠ_I  (mm)", 1, 50, 8, step=1, key="i_tf")
         tw_i_mm = st.slider("Web thickness  t_w  (mm)", 1, 50, 5, step=1, key="i_tw")
 
